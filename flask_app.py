@@ -67,7 +67,7 @@ def fetch_edhrec_data(card_name: str):
             'labelPercentage': int(match.groups()[1])
         }
     except:
-        raise Exception(f'error whigle trying to fetch {original_card_name if original_card_name else card_name}')
+        raise Exception(f'error while trying to fetch {original_card_name if original_card_name else card_name}')
 
 
 @app.route('/')
@@ -93,7 +93,15 @@ def get_score():
         if skip_wastes:
             decklist = list(filter(lambda entry: entry[1].lower() != 'wastes', decklist))
 
-        decklist = list(map(lambda card: (card[0], fetch_edhrec_data(card[1])), decklist))
+        decklist_new = []
+        errors = []
+
+        for card in decklist:
+            try:
+                decklist_new.append((card[0], fetch_edhrec_data(card[1])))
+            except Exception as e:
+                errors.append(str(e))
+        decklist = decklist_new
         sum_cards = sum(map(lambda card: card[0], decklist))
         output = {}
 
@@ -112,7 +120,10 @@ def get_score():
                 tier_cards.append(card)
 
             n_cards = sum(map(lambda card: card[0], tier_cards))
-            percentage = n_cards / sum_cards
+            if sum_cards > 0:
+                percentage = n_cards / sum_cards
+            else:
+                percentage = 0
 
             output[tier] = {
                 'n_cards': n_cards,
@@ -129,7 +140,8 @@ def get_score():
             'tiers.html',
             tiers=[(tier[0], tier[1]) for tier in tiers],
             tier_mapping=output,
-            decklist=list(decklist)
+            decklist=list(decklist),
+            errors=errors
         )
     except Exception as error:
         return render_template('error.html', error=str(error))
