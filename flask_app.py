@@ -75,7 +75,7 @@ def get_score():
     tier_breakpoints = {tier[1]: int(request.form.get(tier[1], tier[2])) for tier in tiers}
     decklist = decklist_text.splitlines()
     decklist = [entry.split("(")[0] for entry in decklist]
-    number_pattern = "([0-9]+)? ?(.*)"
+    number_pattern = "([0-9]+)?[x\*]? ?(.*)"
     decklist_groups = [re.match(number_pattern, entry).groups() for entry in decklist]
     decklist = [(parse_int(group[0], 1), group[1].strip()) for group in decklist_groups]
     if skip_basics:
