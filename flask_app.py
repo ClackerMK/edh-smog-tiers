@@ -1,5 +1,6 @@
 import re
 import requests
+import unicodedata
 
 from flask import Flask, render_template, request
 
@@ -23,6 +24,13 @@ tiers = [
 ]
 
 
+def strip_accents(text):
+    text = unicodedata.normalize('NFD', text)\
+           .encode('ascii', 'ignore')\
+           .decode("utf-8")
+
+    return str(text)
+
 def parse_int(string, default):
     if string:
         return int(string)
@@ -34,6 +42,7 @@ def fetch_edhrec_data(card_name: str):
 
     try:
         card_name = card_name.lower()
+        card_name = strip_accents(card_name)
         card_name = card_name.replace(',', "")
         card_name = card_name.replace("+", "plus ")
         card_name = card_name.replace("'", "")
