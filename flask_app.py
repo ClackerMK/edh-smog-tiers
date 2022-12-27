@@ -42,6 +42,7 @@ def fetch_edhrec_data(card_name: str):
     try:
         url = f'https://json.edhrec.com/pages/cards/{card_name}.json'
         response = requests.get(url).json()
+        print(url)
     except Exception as e:
         print(card_names)
         card_name = card_names[0].strip().replace(" ", "-") + "-" + card_names[1].strip().replace(" ", "-")
@@ -49,6 +50,10 @@ def fetch_edhrec_data(card_name: str):
         response = requests.get(url).json()
 
     edhrec_pattern = 'In ([0-9]+) decks\n([0-9]+)% of ([0-9]+) decks'
+
+    if response.get('redirect', None):
+        response = requests.get(f'https://json.edhrec.com/pages{response["redirect"]}.json')
+        response = response.json()
 
     match = re.match(edhrec_pattern, response['container']['json_dict']['card']['label'])
 
