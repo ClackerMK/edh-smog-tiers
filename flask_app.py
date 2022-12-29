@@ -68,13 +68,26 @@ def fetch_edhrec_data(card_name: str):
 
         match = re.match(edhrec_pattern, response['container']['json_dict']['card']['label'])
 
-        return {
-            'name': original_card_name,
-            'labels': response['container']['json_dict']['card']['label'].split('\n'),
-            'numIncluded': int(match.groups()[0]),
-            'numDecks': int(match.groups()[2]),
-            'labelPercentage': int(match.groups()[1])
-        }
+        if match:
+            return {
+                'name': original_card_name,
+                'labels': response['container']['json_dict']['card']['label'].split('\n'),
+                'numIncluded': int(match.groups()[0]),
+                'numDecks': int(match.groups()[2]),
+                'labelPercentage': int(match.groups()[1])
+            }
+        elif response['container']['json_dict']['card']['label'] == '0 decks':
+            return {
+                'name': original_card_name,
+                'labels': ['0 decks'],
+                'numIncluded': '0',
+                # Todo: Retrieve number of decks
+                'numDecks': 'unknown',
+                'labelPercentage': '0'
+            }
+        else:
+            raise ValueError("unable to interpret label")
+
     except:
         raise Exception(f'error while trying to fetch {original_card_name if original_card_name else card_name}')
 
