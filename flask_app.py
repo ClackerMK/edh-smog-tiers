@@ -80,10 +80,10 @@ def fetch_edhrec_data(card_name: str):
             return {
                 'name': original_card_name,
                 'labels': ['0 decks'],
-                'numIncluded': '0',
+                'numIncluded': 0,
                 # Todo: Retrieve number of decks
-                'numDecks': 'unknown',
-                'labelPercentage': '0'
+                'numDecks': float('nan'),
+                'labelPercentage': 0
             }
         else:
             raise ValueError("unable to interpret label")
